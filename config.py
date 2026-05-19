@@ -2,6 +2,8 @@ GESCHIEDENIS_BESTAND="geschiedenis.json"
 
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
+FLIGHTS_URL = "https://serpapi.com/search.json"
+FLIGHTS_API_KEY = "4ac5950c06da03be420be5f7d30660161f9edd800a1b4454eb784ae46600cb79"
 
 WEATHER_CODES = {
     0: "Helder",

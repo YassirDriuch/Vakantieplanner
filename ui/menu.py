@@ -1,11 +1,53 @@
+from datetime import datetime
+
 from airports import airport_data
 from tabulate import tabulate
 
-from services.flight_service import zoek_vlucht
+from services.flight_service import zoek_vluchten
 from services.geocoding_service import zoek_bestemming
 from services.weather_service import get_weer
 from storage.history import print_geschiedenis
 
+
+def zoek_vluchten_menu(bestemming_id):
+    data = {}
+
+    oorsprong_locatie = input("\nWaar vlieg je vandaan?\n")
+    while True:
+        try:
+            retour = int(input("\nWil je een retourvlucht of enkel?\n1. Retour\n2. Enkel\n"))
+
+            match retour:
+                case 1 | 2:
+                    break
+                case _:
+                    print("\nOngeldige keuze. Kies 1 of 2.")
+
+        except ValueError:
+            print("\nOngeldige keuze. Probeer opnieuw.")
+
+    vertrek_datum = input("\nWanneer wil je vertrekken? (dd-mm-yyyy)")
+    if retour == 1:
+        terug_datum = input("\nWanneer wil je terugkomen? (dd-mm-yyyy)")
+        data["retour_datum"]= datetime.strptime(terug_datum, "%d-%m-%Y").strftime("%Y-%m-%d")
+
+    # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
+    oorsprong_data = zoek_bestemming(oorsprong_locatie)
+    if not oorsprong_data:
+        return None
+
+    # Airports-py wordt hier gebruikt om de dichtsbijzijnde vliegveld te berekenen
+    oorsprong_id = airport_data.find_nearby_airports(oorsprong_data.get("latitude"),
+                                                           oorsprong_data.get("longitude")).pop(0).get("iata")
+
+    data.update({
+        "vertrek_id": oorsprong_id,
+        "aankomst_id": bestemming_id,
+        "vertrek_datum": datetime.strptime(vertrek_datum, "%d-%m-%Y").strftime("%Y-%m-%d"),
+        "retour": retour
+    })
+
+    zoek_vluchten(data)
 
 def vraag_bestemming():
 
@@ -48,7 +90,7 @@ def vraag_bestemming():
             case 1:
                 get_weer(bestemming_data)
             case 2:
-                zoek_vlucht()
+                zoek_vluchten_menu(dichtbij_vliegveld.get("iata"))
             case 9:
                 break
             case 0:

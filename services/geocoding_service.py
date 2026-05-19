@@ -11,12 +11,12 @@ def zoek_bestemming(bestemming):
         "language": "nl"
     }
 
-    data = call_api(GEOCODING_URL, params)
+    resultaat = call_api(GEOCODING_URL, params)
 
-    if not data or "results" not in data:
+    if not resultaat or "results" not in resultaat:
         # Bij geen resultaten moeten we terug naar het hoofdmenu
         print("Geen locatie gevonden! Pas je zoekopdracht aan en probeer opnieuw.")
         return None
 
     # Geef alleen het resultaat terug
-    return data["results"][0]
+    return resultaat["results"][0]
