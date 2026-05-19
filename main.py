@@ -1,8 +1,11 @@
+import locale
 from datetime import datetime
 from tabulate import tabulate
 from airports import airport_data
 import requests
 
+# Locale wordt gebruikt voor nummer format (om populatiegrootte duidelijker weer te geven)
+locale.setlocale(locale.LC_ALL, "")
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 WEATHER_CODES = {
@@ -70,7 +73,7 @@ def zoek_bestemming(bestemming):
         print("Geen locatie gevonden! Pas je zoekopdracht aan en probeer opnieuw.")
         return None
 
-    # Geef alleen de resultaat terug
+    # Geef alleen het resultaat terug
     return data["results"][0]
 
 
@@ -120,7 +123,7 @@ def locatie_menu():
     tabel_data = [["Stad", bestemming_data.get("name")],
             ["Land", bestemming_data.get("country")],
             ["Hoogte", f"{int(bestemming_data.get("elevation"))} meter"],
-            ["Populatiegrootte", bestemming_data.get("population")],
+            ["Populatiegrootte", f"{bestemming_data.get("population"):n}"],
             ["Lat", bestemming_data.get("latitude")],
             ["Long", bestemming_data.get("longitude")],
             ["Dichtbijzijnste vliegveld", f"{dichtbij_vliegveld.get("airport")} ({dichtbij_vliegveld.get("iata")})"]]
@@ -137,6 +140,7 @@ def locatie_menu():
             keuze = int(input("Maak een keuze:"))
         except ValueError:
             print("\nOngeldige keuze. Probeer opnieuw.")
+            continue
 
         match keuze:
             case 1:
