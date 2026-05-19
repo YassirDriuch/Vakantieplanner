@@ -21,12 +21,19 @@ def zoek_vluchten(data):
 
     resultaat = call_api(FLIGHTS_URL, params)
 
-    if not resultaat or "error" in resultaat:
-        print(f"Er is iets misgegaan.\n{data["aankomst_id"]}")
+    if not resultaat or "best_flights" not in resultaat:
+        if "other_flights" not in resultaat:
+            print(f"Wij hebben helaas geen vluchten gevonden.")
+            return
+        else:
+            dataset = resultaat["other_flights"]
+            print(f"\nWe hebben {len(dataset)} alternatieve vluchten gevonden voor jou.")
+    else:
+        dataset = resultaat["best_flights"]
+        print(f"\nHier heb je de {len(dataset)} beste vluchten voor jou.")
 
 
-    print(f"\nHier heb je de {len(resultaat['best_flights'])} beste vluchten voor jou.")
-    for result in resultaat["best_flights"]:
+    for result in dataset:
         table = []
         headers = ["Vertrek", "Aankomst", "Vertrektijd", "Aankomsttijd", "Maatschappij"]
         if len(result["flights"]) > 1:

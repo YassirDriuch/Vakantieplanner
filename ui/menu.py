@@ -61,7 +61,8 @@ def vraag_bestemming():
 
     # Airports-py wordt hier gebruikt om de dichtsbijzijnde vliegveld te berekenen
     dichtbij_vliegveld = airport_data.find_nearby_airports(bestemming_data.get("latitude"), bestemming_data.get("longitude")).pop(0)
-
+    dichtbij_data = airport_data.find_nearby_airports(bestemming_data.get("latitude"),
+                                                           bestemming_data.get("longitude"))
     print("\n----- BESTEMMINGSOVERZICHT -----")
     # Een lijst met waardes maken voor Tabulate. Elke lijst binnen onderstaande lijst kan je zien als een rij
     tabel_data = [["Stad", bestemming_data.get("name")],
