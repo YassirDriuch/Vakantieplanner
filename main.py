@@ -1,8 +1,52 @@
+from datetime import datetime
 from tabulate import tabulate
 from airports import airport_data
 import requests
 
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
+FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
+WEATHER_CODES = {
+    0: "Helder",
+
+    1: "Overwegend helder",
+    2: "Gedeeltelijk bewolkt",
+    3: "Bewolkt",
+
+    45: "Mist",
+    48: "Aanvriezende mist",
+
+    51: "Lichte motregen",
+    53: "Matige motregen",
+    55: "Dichte motregen",
+
+    56: "Lichte ijzelmotregen",
+    57: "Dichte ijzelmotregen",
+
+    61: "Lichte regen",
+    63: "Matige regen",
+    65: "Zware regen",
+
+    66: "Lichte ijzelregen",
+    67: "Zware ijzelregen",
+
+    71: "Lichte sneeuwval",
+    73: "Matige sneeuwval",
+    75: "Zware sneeuwval",
+
+    77: "Sneeuwkorrels",
+
+    80: "Lichte regenbuien",
+    81: "Matige regenbuien",
+    82: "Hevige regenbuien",
+
+    85: "Lichte sneeuwbuien",
+    86: "Zware sneeuwbuien",
+
+    95: "Onweer",
+
+    96: "Onweer met lichte hagel",
+    99: "Onweer met zware hagel",
+}
 
 def call_api(url, params):
     # Een API call functie om boilerplate te verminderen.
@@ -35,8 +79,28 @@ def zoek_bestemming(bestemming):
     return data["results"][0]
 
 
-def get_weer():
-    print("Get weer")
+def get_weer(bestemming_data):
+    params = {
+        "latitude": bestemming_data.get("latitude"),
+        "longitude": bestemming_data.get("longitude"),
+        "daily": "temperature_2m_max,temperature_2m_min,sunrise,sunset,weather_code",
+        "timezone": "auto"
+    }
+
+    data = call_api(FORECAST_URL, params)
+
+    if not data or "error" in data:
+        print("Er is iets misgegaan.")
+        return None
+
+    table = []
+
+    for x in range(7):
+        row = [datetime.strptime(data["daily"]["time"][x], "%Y-%m-%d").strftime("%d-%m-%Y"), f"{data["daily"]["temperature_2m_max"][x]}\u00b0C", f"{data["daily"]["temperature_2m_min"][x]}\u00b0C",datetime.strptime(data["daily"]["sunrise"][x], "%Y-%m-%dT%H:%M").strftime("%H:%M"), datetime.strptime(data["daily"]["sunset"][x], "%Y-%m-%dT%H:%M").strftime("%H:%M"), WEATHER_CODES.get(data["daily"]["weather_code"][x], "Onbekende weercode")]
+        table.append(row)
+
+    headers = ["Datum", "Temperatuur (Max)", "Temperatuur (Min)", "Zonsopgang", "Zonsondergang", "Weercode"]
+    print("\n" ,tabulate(table, headers=headers))
 
 
 def zoek_vlucht():
@@ -69,6 +133,7 @@ def locatie_menu():
     print(tabulate(tabel_data))
 
     while True:
+        print("\nKeuzemenu")
         print("1. Weerinformatie")
         print("2. Vlucht zoeken")
         print("9. Terug naar het Hoofdmenu")
@@ -80,7 +145,7 @@ def locatie_menu():
 
         match keuze:
             case 1:
-                get_weer()
+                get_weer(bestemming_data)
             case 2:
                 zoek_vlucht()
             case 9:
