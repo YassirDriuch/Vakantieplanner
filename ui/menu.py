@@ -4,7 +4,7 @@ from tabulate import tabulate
 from services.flight_service import zoek_vlucht
 from services.geocoding_service import zoek_bestemming
 from services.weather_service import get_weer
-from storage.geschiedenis import print_geschiedenis
+from storage.history import print_geschiedenis
 
 
 def vraag_bestemming():
