@@ -26,10 +26,22 @@ def zoek_vluchten_menu(bestemming_id):
         except ValueError:
             print("\nOngeldige keuze. Probeer opnieuw.")
 
-    vertrek_datum = input("\nWanneer wil je vertrekken? (dd-mm-yyyy)")
-    if retour == 1:
-        terug_datum = input("\nWanneer wil je terugkomen? (dd-mm-yyyy)")
-        data["retour_datum"]= datetime.strptime(terug_datum, "%d-%m-%Y").strftime("%Y-%m-%d")
+    while True:
+        try:
+            vertrek_datum = datetime.strptime(input("\nWanneer wil je vertrekken? (dd-mm-yyyy)\n"), "%d-%m-%Y")
+            if vertrek_datum.date() < datetime.today().date():
+                print("\nOngeldige keuze. Datum ligt in het verleden!")
+                continue
+            if retour == 1:
+                terug_datum = datetime.strptime(input("\nWanneer wil je terugkomen? (dd-mm-yyyy)\n"), "%d-%m-%Y")
+                if terug_datum.date() >= datetime.today().date() and terug_datum > vertrek_datum:
+                    data["retour_datum"]= terug_datum.strftime("%Y-%m-%d")
+                else:
+                    print("Ongeldige keuze. Datum ligt in het verleden of is vóór/op de vertrekdatum!")
+                    continue
+            break
+        except ValueError:
+            print("Ongeldig keuze. Typ de datum exact als dd-mm-yyyy (bijv. 25-05-2026).")
 
     # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
     oorsprong_data = zoek_bestemming(oorsprong_locatie)
@@ -47,7 +59,7 @@ def zoek_vluchten_menu(bestemming_id):
     data.update({
         "vertrek_id": oorsprong_id,
         "aankomst_id": bestemming_id,
-        "vertrek_datum": datetime.strptime(vertrek_datum, "%d-%m-%Y").strftime("%Y-%m-%d"),
+        "vertrek_datum": vertrek_datum.strftime("%Y-%m-%d"),
         "retour": retour
     })
 
@@ -56,7 +68,7 @@ def zoek_vluchten_menu(bestemming_id):
 def vraag_bestemming():
 
     print("\n----- LOCATIE MENU -----")
-    bestemming = input("Voer de stadsnaam in van je vakantiebestemming:").strip()
+    bestemming = input("Voer de stadsnaam in van je vakantiebestemming:\n").strip()
 
     # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
     bestemming_data = zoek_bestemming(bestemming)
