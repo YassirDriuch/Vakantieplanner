@@ -109,8 +109,8 @@ def vraag_bestemming():
         print("\nKeuzemenu")
         print("1. Weerinformatie")
         print("2. Vlucht zoeken")
-        print("9. Terug naar het Hoofdmenu")
-        print("0. Sluiten")
+        print("9. Sluiten")
+        print("0. Terug naar het Hoofdmenu")
         try:
             keuze = int(input("Maak een keuze:"))
         except ValueError:
@@ -123,9 +123,9 @@ def vraag_bestemming():
             case 2:
                 zoek_vluchten_menu(dichtbij_vliegveld.get("iata"))
             case 9:
-                break
-            case 0:
                 exit(0)
+            case 0:
+                break
 
 
 # Hoofdmenu
