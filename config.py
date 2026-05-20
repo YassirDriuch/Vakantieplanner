@@ -2,17 +2,18 @@ import os
 
 from dotenv import load_dotenv
 
-# Gezien er gebruik wordt gemaakt van een private API key is het nodig om een .env bestand in te laden en deze niet hardcoded moet achterblijven
+# Gezien er gebruik wordt gemaakt van een private API key is het nodig om een .env bestand in te laden en niet te hardcoden.
 load_dotenv()
+FLIGHTS_API_KEY = os.getenv("FLIGHTS_API_KEY")
+if not FLIGHTS_API_KEY:
+    raise ValueError("Geen API key gevonden. Zet FLIGHTS_API_KEY in je .env bestand.")
 
 GESCHIEDENIS_BESTAND="geschiedenis.json"
 
 GEOCODING_URL = "https://geocoding-api.open-meteo.com/v1/search"
 FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 FLIGHTS_URL = "https://serpapi.com/search.json"
-FLIGHTS_API_KEY = os.getenv("FLIGHTS_API_KEY")
-if not FLIGHTS_API_KEY:
-    raise ValueError("Geen API key gevonden. Zet FLIGHTS_API_KEY in je .env bestand.")
+
 
 WEATHER_CODES = {
     0: "Helder",

@@ -27,4 +27,5 @@ def get_weer(bestemming_data):
         table.append(dag)
 
     headers = ["Datum", "Temperatuur (Max)", "Temperatuur (Min)", "Zonsopgang", "Zonsondergang", "Weercode"]
-    print("\n" ,tabulate(table, headers, tablefmt="fancy_grid"))
+    print(f"\nHet weer in {bestemming_data.get('name')}, {bestemming_data.get('country')}")
+    print(tabulate(table, headers, tablefmt="fancy_grid"))

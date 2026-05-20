@@ -11,8 +11,13 @@ from storage.history import print_geschiedenis, toevoegen_geschiedenis
 
 def zoek_vluchten_menu(bestemming_id):
     data = {}
-
-    oorsprong_locatie = input("\nWaar vlieg je vandaan?\n")
+    while True:
+        oorsprong_locatie = input("\nWaar vlieg je vandaan?\n")
+        # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
+        oorsprong_data = zoek_bestemming(oorsprong_locatie)
+        if not oorsprong_data:
+            continue
+        break
     while True:
         try:
             retour = int(input("\nWil je een retourvlucht of enkel?\n1. Retour\n2. Enkel\n"))
@@ -43,8 +48,7 @@ def zoek_vluchten_menu(bestemming_id):
         except ValueError:
             print("Ongeldig keuze. Typ de datum exact als dd-mm-yyyy (bijv. 25-05-2026).")
 
-    # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
-    oorsprong_data = zoek_bestemming(oorsprong_locatie)
+
     if not oorsprong_data:
         return None
 
@@ -67,11 +71,16 @@ def zoek_vluchten_menu(bestemming_id):
 
 def vraag_bestemming():
 
-    print("\n----- LOCATIE MENU -----")
-    bestemming = input("Voer de stadsnaam in van je vakantiebestemming:\n").strip()
+    while True:
+        print("\n----- LOCATIE MENU -----")
+        bestemming = input("Voer de stadsnaam in van je vakantiebestemming:\n").strip()
 
-    # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
-    bestemming_data = zoek_bestemming(bestemming)
+        # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
+        bestemming_data = zoek_bestemming(bestemming)
+        if not bestemming_data:
+            continue
+        break
+
     toevoegen_geschiedenis(f"{bestemming_data.get('name')}, {bestemming_data.get('country')}")
 
     if not bestemming_data:
