@@ -6,7 +6,7 @@ from tabulate import tabulate
 from services.flight_service import zoek_vluchten
 from services.geocoding_service import zoek_bestemming
 from services.weather_service import get_weer
-from storage.history import print_geschiedenis
+from storage.history import print_geschiedenis, toevoegen_geschiedenis
 
 
 def zoek_vluchten_menu(bestemming_id):
@@ -56,10 +56,12 @@ def zoek_vluchten_menu(bestemming_id):
 def vraag_bestemming():
 
     print("\n----- LOCATIE MENU -----")
-    bestemming = input("Voer de stadsnaam in van je vakantiebestemming:").lower().strip()
+    bestemming = input("Voer de stadsnaam in van je vakantiebestemming:").strip()
 
     # Nadat gebruiker ons de bestemming geeft doen we een GET call naar Open Meteo Geocaching API om geolocatie op te halen.
     bestemming_data = zoek_bestemming(bestemming)
+    toevoegen_geschiedenis(f"{bestemming_data.get('name')}, {bestemming_data.get('country')}")
+
     if not bestemming_data:
         return None
 

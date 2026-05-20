@@ -57,7 +57,7 @@ def zoek_vluchten(data):
             print("===== Heenreis =====")
             print(tabulate(table, headers, tablefmt="fancy_grid"), "\n")
             duur_uren, duur_minuten = divmod(result['total_duration'], 60)
-            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+            print("Totale reistijd:", f"{duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
 
             table = []
             retour_param = params.copy()
@@ -74,16 +74,16 @@ def zoek_vluchten(data):
                     [retour_result[0]["flights"][0]["departure_airport"]["name"], retour_result[0]["flights"][0]["arrival_airport"]["name"],
                      retour_result[0]["flights"][0]["departure_airport"]["time"], retour_result[0]["flights"][0]["arrival_airport"]["time"],
                      retour_result[0]["flights"][0]["airline"]])
-            print("===== Terugreis =====")
+            print("\n===== Terugreis =====")
             print(tabulate(table, headers, tablefmt="fancy_grid"), f"€{retour_result[0]['price']}\n")
 
             duur_uren, duur_minuten = divmod(retour_result[0]['total_duration'], 60)
-            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+            print("Totale reistijd:", f"{duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
         else:
-            print("===== Heenreis =====")
+            print("\n===== Heenreis =====")
             print(tabulate(table, headers, tablefmt="fancy_grid"), f"€{result['price']}\n")
             duur_uren, duur_minuten = divmod(result['total_duration'], 60)
-            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+            print("Totale reistijd:", f"{duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
 
-    print(f"Google Vluchten: {resultaat["search_metadata"]["google_flights_url"]}")
+    print(f"\nGoogle Vluchten: {resultaat["search_metadata"]["google_flights_url"]}")
 
