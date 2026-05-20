@@ -3,6 +3,17 @@ from tabulate import tabulate
 from config import FLIGHTS_URL, FLIGHTS_API_KEY
 from services.api_client import call_api
 
+def haal_dataset(resultaat):
+    if not resultaat:
+        return None
+
+    if resultaat.get("best_flights"):
+        return resultaat["best_flights"]
+
+    if resultaat.get("other_flights"):
+        return resultaat["other_flights"]
+
+    return None
 
 def zoek_vluchten(data):
     params = {
@@ -21,17 +32,13 @@ def zoek_vluchten(data):
 
     resultaat = call_api(FLIGHTS_URL, params)
 
-    if not resultaat or "best_flights" not in resultaat:
-        if "other_flights" not in resultaat:
-            print(f"Wij hebben helaas geen vluchten gevonden.")
-            return
-        else:
-            dataset = resultaat["other_flights"]
-            print(f"\nWe hebben {len(dataset)} alternatieve vluchten gevonden voor jou.")
-    else:
-        dataset = resultaat["best_flights"]
-        print(f"\nHier heb je de {len(dataset)} beste vluchten voor jou.")
+    dataset = haal_dataset(resultaat)
 
+    if not dataset:
+        print("\nWe hebben helaas geen resultaten gevonden")
+        return
+
+    print(f"\nWe hebben {len(dataset)} vluchten gevonden voor jou.\n")
 
     for result in dataset:
         table = []
@@ -43,4 +50,40 @@ def zoek_vluchten(data):
             table.append([result["flights"][0]["departure_airport"]["name"], result["flights"][0]["arrival_airport"]["name"],
                           result["flights"][0]["departure_airport"]["time"], result["flights"][0]["arrival_airport"]["time"], result["flights"][0]["airline"]])
 
-        print(tabulate(table, headers, tablefmt="fancy_grid"), f"€{result['price']}")
+
+
+        if "departure_token" in result:
+
+            print("===== Heenreis =====")
+            print(tabulate(table, headers, tablefmt="fancy_grid"), "\n")
+            duur_uren, duur_minuten = divmod(result['total_duration'], 60)
+            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+
+            table = []
+            retour_param = params.copy()
+            retour_param["departure_token"] = result["departure_token"]
+            retour_result = haal_dataset(call_api(FLIGHTS_URL, params=retour_param))
+
+            if len(retour_result[0]["flights"]) > 1:
+                for flight in retour_result[0]["flights"]:
+                    table.append([flight["departure_airport"]["name"], flight["arrival_airport"]["name"],
+                                  flight["departure_airport"]["time"], flight["arrival_airport"]["time"],
+                                  flight["airline"]])
+            else:
+                table.append(
+                    [retour_result[0]["flights"][0]["departure_airport"]["name"], retour_result[0]["flights"][0]["arrival_airport"]["name"],
+                     retour_result[0]["flights"][0]["departure_airport"]["time"], retour_result[0]["flights"][0]["arrival_airport"]["time"],
+                     retour_result[0]["flights"][0]["airline"]])
+            print("===== Terugreis =====")
+            print(tabulate(table, headers, tablefmt="fancy_grid"), f"€{retour_result[0]['price']}\n")
+
+            duur_uren, duur_minuten = divmod(retour_result[0]['total_duration'], 60)
+            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+        else:
+            print("===== Heenreis =====")
+            print(tabulate(table, headers, tablefmt="fancy_grid"), f"€{result['price']}\n")
+            duur_uren, duur_minuten = divmod(result['total_duration'], 60)
+            print(f"Totale reistijd: {duur_uren} uur en {duur_minuten} min" if duur_uren > 0 else f"{duur_minuten} min")
+
+    print(f"Google Vluchten: {resultaat["search_metadata"]["google_flights_url"]}")
+

@@ -37,8 +37,12 @@ def zoek_vluchten_menu(bestemming_id):
         return None
 
     # Airports-py wordt hier gebruikt om de dichtsbijzijnde vliegveld te berekenen
-    oorsprong_id = airport_data.find_nearby_airports(oorsprong_data.get("latitude"),
-                                                           oorsprong_data.get("longitude")).pop(0).get("iata")
+    oorsprong_id = airport_data.find_nearest_airport(oorsprong_data.get("latitude"),
+                                                           oorsprong_data.get("longitude"), {
+                                                         'has_scheduled_service': True,
+                                                         'min_runway_ft': 100,
+                                                         'country_code': oorsprong_data.get("country_code")
+                                                     }).get("iata")
 
     data.update({
         "vertrek_id": oorsprong_id,
@@ -60,9 +64,12 @@ def vraag_bestemming():
         return None
 
     # Airports-py wordt hier gebruikt om de dichtsbijzijnde vliegveld te berekenen
-    dichtbij_vliegveld = airport_data.find_nearby_airports(bestemming_data.get("latitude"), bestemming_data.get("longitude")).pop(0)
-    dichtbij_data = airport_data.find_nearby_airports(bestemming_data.get("latitude"),
-                                                           bestemming_data.get("longitude"))
+    dichtbij_vliegveld = airport_data.find_nearest_airport(bestemming_data.get("latitude"),
+                                                           bestemming_data.get("longitude"), {
+                                                        'has_scheduled_service': True,
+                                                        'min_runway_ft': 100,
+                                                        'country_code': bestemming_data.get("country_code")
+                                                     })
     print("\n----- BESTEMMINGSOVERZICHT -----")
     # Een lijst met waardes maken voor Tabulate. Elke lijst binnen onderstaande lijst kan je zien als een rij
     tabel_data = [["Stad", bestemming_data.get("name")],
@@ -73,7 +80,7 @@ def vraag_bestemming():
             ["Long", bestemming_data.get("longitude")],
             ["Dichtbijzijnste vliegveld", f"{dichtbij_vliegveld.get("airport")} ({dichtbij_vliegveld.get("iata")})"]]
 
-    print(tabulate(tabel_data))
+    print(tabulate(tabel_data, tablefmt="fancy_grid"))
 
     while True:
         print("\nKeuzemenu")
